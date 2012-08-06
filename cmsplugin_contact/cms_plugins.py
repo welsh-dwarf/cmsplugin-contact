@@ -107,19 +107,32 @@ class ContactPlugin(CMSPluginBase):
         subject = form.cleaned_data['subject']
         if not subject:
             subject = _('No subject')
-        email_message = EmailMessage(
-            render_to_string(self.subject_template, {
-                'subject': subject,
-            }).splitlines()[0],
-            render_to_string(self.email_template, {
-                'data': form.cleaned_data,
-            }),
-            getattr(settings, 'DEFAULT_FROM_EMAIL', form.cleaned_data['email']),
-            [site_email],
-            headers = {
-                'Reply-To': form.cleaned_data['email']
-            },)
-        email_message.send(fail_silently=False)
+        if (settings.USE_GAE_MAIL is True):
+            email_message = EmailMessage(
+                subject=render_to_string(self.subject_template, {
+                    'subject': subject,
+                }).splitlines()[0],
+                body=render_to_string(self.email_template, {
+                    'data': form.cleaned_data,
+                }),
+                sender=getattr(settings, 'DEFAULT_FROM_EMAIL'),
+                to=site_email,
+                reply_to=form.cleaned_data['email'])
+            email_message.send()
+        else:
+            email_message = EmailMessage(
+                render_to_string(self.subject_template, {
+                    'subject': subject,
+                }).splitlines()[0],
+                render_to_string(self.email_template, {
+                    'data': form.cleaned_data,
+                }),
+                getattr(settings, 'DEFAULT_FROM_EMAIL', form.cleaned_data['email']),
+                [site_email],
+                headers={
+                    'Reply-To': form.cleaned_data['email']
+                },)
+            email_message.send(fail_silently=False)
     
     def render(self, context, instance, placeholder):
         request = context['request']
