@@ -1,7 +1,18 @@
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.forms.fields import CharField
-from django.core.mail import EmailMessage
+
+# Ensure variable is defined
+try:
+    settings.USE_GAE_MAIL
+except NameError:
+    settings.USE_GAE_MAIL = None
+
+if (settings.USE_GAE_MAIL is True):
+    from google.appengine.api.mail import EmailMessage
+else:
+    from django.core.mail import EmailMessage
+
 from django.template.loader import render_to_string
 
 from cms.plugin_base import CMSPluginBase

@@ -64,6 +64,11 @@ DEFAULT_FROM_EMAIL
 This django setting is used to set the ``From`` header of the emails. The value you can enter in django admin only sets the ``Reply-To`` header.
 This is because many servers reject mails that claim to be ``From`` different email addresses than registered with the server.
 
+USE_GAE_MAIL
+------------
+
+This makes the form use Googles mail API instead of Djangos internal one. Defaults to false
+
 
 Extending
 =========
